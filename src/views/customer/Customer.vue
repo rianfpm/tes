@@ -32,18 +32,18 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th>1</th>
-            <td>Rian</td>
-            <td>0812808080</td>
-            <td>rian@gmail.com</td>
-            <td>Palayu Raya</td>
-            <td>1</td>
-            <td>fix</td>
-            <td>foto</td>
+          <tr v-for="(data, index) in customer" :key="index">
+            <th>{{ index + 1 }}</th>
+            <td>{{ data.name }}</td>
+            <td>{{ data.contact }}</td>
+            <td>{{ data.email }}</td>
+            <td>{{ data.alamat }}</td>
+            <td>{{ data.diskon }}</td>
+            <td>{{ data.tipe_diskon }}</td>
+            <td>{{ data.ktp }}</td>
             <td>
-              <router-link to="/customer-edit">Edit</router-link> |
-              <a href="#">Hapus</a>
+              <router-link :to="{name: 'EditCustomer', params: {id: data.customer_id}}">Edit</router-link> |
+              <a href="#" @click="deleteCustomer(data.customer_id, index)">Hapus</a>
             </td>
           </tr>
         </tbody>
@@ -66,51 +66,61 @@
             class="btn-close"
             data-bs-dismiss="modal"
             aria-label="Close"
+            @click="$emit('close')"
           ></button>
         </div>
         <div class="modal-body">
-          <form action="<?= BASEURL; ?>/mahasiswa/tambah" method="post">
+          <form @submit.prevent="submitForm">
             <input type="hidden" name="id" id="id" />
             <div class="mb-3">
               <label for="nama" class="form-label">Nama</label>
-              <input type="text" class="form-control" id="nama" />
+              <input type="text" class="form-control" v-model="formData.name" />
             </div>
             <div class="mb-3">
               <label for="contact" class="form-label">Contact</label>
-              <input type="text" class="form-control" id="contact" />
+              <input
+                type="text"
+                class="form-control"
+                v-model="formData.contact"
+              />
             </div>
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" />
+              <input
+                type="email"
+                class="form-control"
+                v-model="formData.email"
+              />
             </div>
             <div class="mb-3">
               <label for="alamat" class="form-label">Alamat</label>
-              <textarea class="form-control" id="alamat" rows="3"></textarea>
+              <textarea
+                class="form-control"
+                v-model="formData.alamat"
+                rows="3"
+              ></textarea>
             </div>
             <div class="mb-3">
               <label for="diskon" class="form-label">Diskon</label>
-              <input type="number" class="form-control" id="diskon" />
+              <input
+                type="number"
+                class="form-control"
+                v-model="formData.diskon"
+              />
             </div>
             <div class="mb-3">
               <label for="type_diskon" class="form-label">Tipe Diskon</label>
-              <select class="form-control" id="type_diskon">
+              <select class="form-control" v-model="formData.tipe_diskon">
                 <option value="persentase">Percent</option>
                 <option value="fix">Fix</option>
               </select>
             </div>
             <div class="mb-3">
               <label for="ktp" class="form-label">KTP</label>
-              <input type="file" class="form-control" id="ktp" />
+              <input type="file" class="form-control" @change="encodeImage" />
             </div>
 
             <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
               <button type="submit" class="btn btn-primary">Tambah Data</button>
             </div>
           </form>
@@ -133,20 +143,85 @@ export default {
   data() {
     return {
       customer: [],
+      formData: {
+        name: "",
+        contact: "",
+        email: "",
+        alamat: "",
+        diskon: "",
+        tipe_diskon: "",
+        ktp: "",
+      },
     };
   },
   methods: {
     fetchData() {
       axios
-        .get("http://localhost:3002/")
+        .get("http://localhost:3002/customer")
         .then((response) => {
-          console.log("asodkaosdaosdads");
-          this.customer = response.data.data;
+          this.customer = response.data;
+          console.log(this.customer);
         })
         .catch((error) => {
           console.log(error);
         });
     },
+    submitForm() {
+      // Mengirim data form ke backend
+      axios
+        .post("http://localhost:3002/customer", this.formData)
+        .then((response) => {
+          alert(response.data.message);
+          this.fetchData();
+          this.resetForm();
+          this.closeModal();
+          this.$emit("close-modal");
+        })
+        .catch((error) => {
+          alert(error.response.data);
+        });
+    },
+    encodeImage(event) {
+      // Mengonversi file KTP menjadi base64
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.formData.ktp = reader.result;
+      };
+      reader.readAsDataURL(file);
+    },
+    closeModal() {
+      $("#formModal").modal("hide");
+      this.$emit("close-modal");
+    },
+    resetForm() {
+      this.formData = {
+        name: "",
+        contact: "",
+        email: "",
+        alamat: "",
+        diskon: "",
+        tipe_diskon: "",
+        ktp: "",
+      };
+    },
+    deleteCustomer(id, index) {
+      // console.log(id);
+      axios.delete(`http://localhost:3002/customer/${id}`)
+        .then((response) => {
+          // menghapus data dari daftar customer setelah berhasil dihapus dari server
+          // this.customer.splice(index, 1);
+          this.fetchData();
+          alert(response.data.message);
+        })
+        .catch((error) => {
+          console.error(error);
+          alert(error.response.data.message);
+        });
+    },
+  },
+  mounted() {
+    this.fetchData();
   },
 };
 </script>
