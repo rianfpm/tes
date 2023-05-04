@@ -60,7 +60,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="judulModal">Tambah Data Item</h1>
+          <h1 class="modal-title fs-5" id="judulModal">Tambah Data Customer</h1>
           <button
             type="button"
             class="btn-close"

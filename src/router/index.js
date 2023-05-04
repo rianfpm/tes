@@ -5,7 +5,7 @@ import Item from '../views/item/Item.vue'
 import Sales from '../views/sales/Sales.vue'
 import EditCustomer from '../views/customer/EditCustomer.vue'
 import EditItem from '../views/item/EditItem.vue'
-import EditSales from '../views/sales/EditSales.vue'
+import DetailSales from '../views/sales/DetailSales.vue'
 
 const routes = [
   {
@@ -29,7 +29,7 @@ const routes = [
     component: Item
   },
   {
-    path: '/item-edit',
+    path: '/item-edit/:id',
     name: 'EditItem',
     component: EditItem
   },
@@ -39,9 +39,9 @@ const routes = [
     component: Sales
   },
   {
-    path: '/sales-edit',
-    name: 'EditSales',
-    component: EditSales
+    path: '/sales-detail',
+    name: 'DetailSales',
+    component: DetailSales
   },
   {
     path: '/about',
