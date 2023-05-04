@@ -127,12 +127,11 @@ export default {
   updateData() {
     axios.put(`http://localhost:3002/customer`, this.customer)
       .then(response => {
-        console.log(response.data);
         alert(response.data.message);
+        this.$router.push({ name: 'Customer' });
       })
       .catch(error => {
-        console.log(error);
-        // do something
+        alert(error.response.data.message)
       });
   },
   fecthdata(){
@@ -140,8 +139,10 @@ export default {
     axios.get(`http://localhost:3002/customer/${id}`).then(response => {
       this.customer = response.data;
       console.log(response.data);
-      // jika properti image pada response adalah sebuah url file, maka dapat langsung dimasukkan ke dalam property image pada object ktp
-      // this.customer.ktp.image = response.data.ktp;
+      this.customer.ktp = {
+        update: false,
+        image: response.data.ktp
+      };
     });
   }
   },
@@ -153,5 +154,5 @@ export default {
 };
 </script>
   
-  <style>
+<style>
 </style>
